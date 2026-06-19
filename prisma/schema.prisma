@@ -1,0 +1,75 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Required by @shopify/shopify-app-session-storage-prisma to persist
+// OAuth sessions for the embedded admin app.
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+}
+
+// One row per shop. Holds everything the merchant can change from the
+// "Settings" page inside Shopify admin: who receives the mail, the
+// matching rule, SMTP credentials, and the editable template.
+model Settings {
+  id                  Int      @id @default(autoincrement())
+  shop                String   @unique
+
+  // Who gets the email. Editable any time from the app's Settings page.
+  recipientEmail      String?
+
+  // The matching rule. Defaults match the brief (tag "HyperLocal" +
+  // delivery method "HyperLocal (Prepaid)") but are editable in case
+  // the tag/shipping method name ever changes in Shopify.
+  matchTag            String   @default("HyperLocal")
+  matchShippingMethod String   @default("HyperLocal (Prepaid)")
+
+  // SMTP connection details (Gmail / Outlook / custom domain mailbox).
+  smtpHost            String?
+  smtpPort            Int      @default(587)
+  smtpSecure          Boolean  @default(false)
+  smtpUser            String?
+  smtpPass            String?
+  smtpFrom            String?
+
+  // Editable template. {{variable}} placeholders get substituted with
+  // real order data at send time - see app/utils/template.server.js.
+  subjectTemplate     String   @default("New HyperLocal order #{{order_number}}")
+  bodyTemplateHtml    String?
+
+  updatedAt           DateTime @updatedAt
+}
+
+// Audit trail so the merchant can see, inside the admin UI, exactly which
+// orders triggered a mail, to whom, and whether it succeeded.
+model MailLog {
+  id             Int      @id @default(autoincrement())
+  shop           String
+  orderId        String
+  orderNumber    String
+  recipientEmail String
+  status         String // "SENT" | "FAILED" | "SKIPPED"
+  error          String?
+  createdAt      DateTime @default(now())
+
+  @@index([shop, createdAt])
+}

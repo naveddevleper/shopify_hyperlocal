@@ -1,0 +1,40 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "hyperlocal-mailer"
+client_id = "REPLACE_WITH_YOUR_CLIENT_ID"
+application_url = "https://REPLACE_WITH_YOUR_APP_URL"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "REPLACE_WITH_YOUR_DEV_STORE.myshopify.com"
+
+[webhooks]
+api_version = "2025-01"
+
+# Fires the instant an order is created (placed, even before payment capture
+# finishes in some flows) - this is what we use to send the HyperLocal mail.
+[[webhooks.subscriptions]]
+topics = ["orders/create"]
+uri = "/webhooks/orders/create"
+
+# Lets the app clean up its own data when a merchant uninstalls it.
+[[webhooks.subscriptions]]
+topics = ["app/uninstalled"]
+uri = "/webhooks/app/uninstalled"
+
+[access_scopes]
+# read_orders is required to receive order webhooks and read order data
+# (tags, shipping_lines, customer info) inside the handler.
+scopes = "read_orders"
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [
+  "https://REPLACE_WITH_YOUR_APP_URL/auth/callback",
+  "https://REPLACE_WITH_YOUR_APP_URL/auth/shopify/callback",
+  "https://REPLACE_WITH_YOUR_APP_URL/api/auth/callback"
+]
+
+[pos]
+embedded = false
