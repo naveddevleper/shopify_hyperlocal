@@ -1,0 +1,154 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs-eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "root": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/webhooks.app.uninstalled": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/webhooks.orders.create": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/app.settings": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/app._index": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/auth.login": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/auth.$": "nodejs-eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "path": "",
+        "id": "root",
+        "file": "app/root.jsx",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/webhooks.app.uninstalled": {
+        "file": "app/routes/webhooks.app.uninstalled.jsx",
+        "id": "routes/webhooks.app.uninstalled",
+        "path": "webhooks/app/uninstalled",
+        "parentId": "root",
+        "config": {}
+      },
+      "routes/webhooks.orders.create": {
+        "file": "app/routes/webhooks.orders.create.jsx",
+        "id": "routes/webhooks.orders.create",
+        "path": "webhooks/orders/create",
+        "parentId": "root",
+        "config": {}
+      },
+      "routes/app.settings": {
+        "file": "app/routes/app.settings.jsx",
+        "id": "routes/app.settings",
+        "path": "settings",
+        "parentId": "routes/app",
+        "config": {}
+      },
+      "routes/app._index": {
+        "file": "app/routes/app._index.jsx",
+        "id": "routes/app._index",
+        "index": true,
+        "parentId": "routes/app",
+        "config": {}
+      },
+      "routes/auth.login": {
+        "file": "app/routes/auth.login/route.jsx",
+        "id": "routes/auth.login",
+        "path": "auth/login",
+        "parentId": "root",
+        "config": {}
+      },
+      "routes/auth.$": {
+        "file": "app/routes/auth.$.jsx",
+        "id": "routes/auth.$",
+        "path": "auth/*",
+        "parentId": "root",
+        "config": {}
+      },
+      "routes/app": {
+        "file": "app/routes/app.jsx",
+        "id": "routes/app",
+        "path": "app",
+        "parentId": "root",
+        "config": {}
+      }
+    }
+  },
+  "remixConfig": {
+    "appDirectory": "/home/claude/shopify-hyperlocal-mailer/app",
+    "basename": "/",
+    "buildDirectory": "/home/claude/shopify-hyperlocal-mailer/build",
+    "future": {
+      "v3_fetcherPersist": false,
+      "v3_relativeSplatPath": false,
+      "v3_throwAbortReason": false,
+      "v3_routeConfig": false,
+      "v3_singleFetch": false,
+      "v3_lazyRouteDiscovery": false,
+      "unstable_optimizeDeps": false
+    },
+    "manifest": false,
+    "publicPath": "/",
+    "routes": {
+      "root": {
+        "path": "",
+        "id": "root",
+        "file": "root.jsx"
+      },
+      "routes/webhooks.app.uninstalled": {
+        "file": "routes/webhooks.app.uninstalled.jsx",
+        "id": "routes/webhooks.app.uninstalled",
+        "path": "webhooks/app/uninstalled",
+        "parentId": "root"
+      },
+      "routes/webhooks.orders.create": {
+        "file": "routes/webhooks.orders.create.jsx",
+        "id": "routes/webhooks.orders.create",
+        "path": "webhooks/orders/create",
+        "parentId": "root"
+      },
+      "routes/app.settings": {
+        "file": "routes/app.settings.jsx",
+        "id": "routes/app.settings",
+        "path": "settings",
+        "parentId": "routes/app"
+      },
+      "routes/app._index": {
+        "file": "routes/app._index.jsx",
+        "id": "routes/app._index",
+        "index": true,
+        "parentId": "routes/app"
+      },
+      "routes/auth.login": {
+        "file": "routes/auth.login/route.jsx",
+        "id": "routes/auth.login",
+        "path": "auth/login",
+        "parentId": "root"
+      },
+      "routes/auth.$": {
+        "file": "routes/auth.$.jsx",
+        "id": "routes/auth.$",
+        "path": "auth/*",
+        "parentId": "root"
+      },
+      "routes/app": {
+        "file": "routes/app.jsx",
+        "id": "routes/app",
+        "path": "app",
+        "parentId": "root"
+      }
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}

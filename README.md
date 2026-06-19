@@ -86,14 +86,27 @@ that file.
 
 ### 2. Set up the database
 
+This project's `prisma/schema.prisma` targets **Postgres** by default so it
+works out of the box on Vercel (or any serverless host). For local dev you
+have two options:
+
+**Option A — local Postgres** (matches production exactly):
 ```bash
 cp .env.example .env
+# edit .env: set DATABASE_URL to a local/hosted Postgres connection string
 npx prisma generate
 npx prisma migrate dev --name init
 ```
 
-SQLite is fine for a single store. The migration creates `dev.sqlite` plus
-the `Session`, `Settings`, and `MailLog` tables.
+**Option B — quick local SQLite** (simpler for just trying it out, but you
+must switch back to Postgres before deploying to Vercel):
+```bash
+cp .env.example .env
+# edit .env: DATABASE_URL="file:dev.sqlite"
+# edit prisma/schema.prisma: change provider = "postgresql" to "sqlite"
+npx prisma generate
+npx prisma migrate dev --name init
+```
 
 ### 3. Run it
 
@@ -129,20 +142,56 @@ Within seconds of the order landing, the email should arrive. The
 **Home** page inside the app shows a log of every match (sent, failed, or
 skipped) so you can confirm it fired.
 
-## Going to production
+## Deploying to Vercel
 
-1. **Host it somewhere persistent.** Any Node host works (Render, Railway,
-   Fly.io, a VPS). Set `npm run setup && npm run start` as the start command
-   — `setup` runs Prisma migrations, `start` runs the built server.
-2. **Use Postgres instead of SQLite** if your host's filesystem is
-   ephemeral (most are) — change `DATABASE_URL` and `datasource.provider`
-   in `prisma/schema.prisma` to `"postgresql"`.
-3. **Deploy app config**: `npx shopify app deploy` pushes
-   `shopify.app.toml` (including the webhook subscription) to Shopify, and
-   `npx shopify app config push` updates URLs after you point
-   `application_url` at your real production domain.
-4. Update `shopify.app.toml`'s `application_url` and `redirect_urls` to your
-   real domain before deploying.
+This project is configured for Vercel out of the box (`@vercel/remix` preset
+in `vite.config.js`, Postgres-based Prisma schema). Checklist:
+
+1. **Create a Postgres database.** Easiest options: Vercel Postgres (from
+   your Vercel project's **Storage** tab) or [Neon](https://neon.tech)
+   (free tier). Copy its **pooled** connection string (Vercel Postgres
+   calls it `POSTGRES_PRISMA_URL`; Neon's pooled host has `-pooler` in it).
+2. **Set environment variables** in Vercel → Project → Settings →
+   Environment Variables (your local `.env` file is never read in
+   production — these must be added in the dashboard):
+   - `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET` — from `shopify.app.toml` /
+     Partner dashboard
+   - `SHOPIFY_APP_URL` — your Vercel deployment URL, e.g.
+     `https://your-app.vercel.app`
+   - `SCOPES` — `read_orders`
+   - `DATABASE_URL` — the pooled Postgres connection string from step 1
+3. **Push/redeploy.** `npm run postinstall` (`prisma generate`) runs
+   automatically during Vercel's build via the `postinstall` script.
+4. **Run the migration against your production database** (one-time, from
+   your own machine — point `DATABASE_URL` at the same pooled connection
+   string first):
+   ```bash
+   npx prisma migrate deploy
+   ```
+5. **Update `shopify.app.toml`** — set `application_url` and the three
+   `redirect_urls` to your real `https://your-app.vercel.app` domain, then
+   run `npx shopify app deploy` to push the config (including the
+   `orders/create` webhook subscription) to Shopify.
+
+**If a deploy still crashes**, check Vercel's actual function logs — the
+public "Function crashed" page never shows the real error. In the Vercel
+dashboard: Deployments → (your deployment) → Functions → click the
+function → Logs. That stack trace is what to debug from (or paste it back
+here).
+
+## Deploying elsewhere (Render / Railway / Fly.io)
+
+These platforms run a persistent Node process, so SQLite works fine if you
+prefer not to set up Postgres:
+
+1. Switch `prisma/schema.prisma`'s `provider` back to `"sqlite"` if you
+   want to keep using it, and set `DATABASE_URL="file:dev.sqlite"`.
+2. Set the same `SHOPIFY_API_KEY` / `SHOPIFY_API_SECRET` / `SHOPIFY_APP_URL`
+   / `SCOPES` env vars in that platform's dashboard.
+3. Use `npm run setup && npm run start` as the start command — `setup` runs
+   Prisma migrations, `start` runs the built server via `remix-serve`.
+4. Update `shopify.app.toml`'s `application_url` and `redirect_urls`, then
+   `npx shopify app deploy`.
 
 ## Reliability notes
 
